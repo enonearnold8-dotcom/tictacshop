@@ -1,0 +1,434 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0b1a40">
+<title>TicTacShop</title>
+<style>
+:root{--bg:#fff;--bg2:#f2f2f2;--text:#0f0f0f;--muted:#606060;--line:#e5e5e5;--accent:#1557d6;--red:#e11d48;--chip:#f2f2f2;--chipA:#0f0f0f;--chipAt:#fff;--hover:#0000000d}
+[data-theme=dark]{--bg:#0f0f0f;--bg2:#272727;--text:#f1f1f1;--muted:#aaa;--line:#3f3f3f;--accent:#6b9bff;--chip:#272727;--chipA:#f1f1f1;--chipAt:#0f0f0f;--hover:#ffffff1a}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Roboto,Arial,sans-serif;background:var(--bg);color:var(--text);font-size:14px}
+button,select{font:inherit;color:inherit}
+button{background:none;border:0;cursor:pointer}
+a{color:inherit;text-decoration:none}
+.ic{width:40px;height:40px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:20px;position:relative}
+.ic:hover{background:var(--hover)}
+.badge{position:absolute;top:2px;right:0;background:var(--red);color:#fff;border-radius:10px;font-size:11px;min-width:18px;padding:1px 4px;text-align:center}
+header{position:fixed;top:0;left:0;right:0;height:56px;background:var(--bg);display:flex;align-items:center;justify-content:space-between;padding:0 16px;z-index:50;gap:8px}
+.hl,.hr{display:flex;align-items:center;gap:8px}
+.logo{display:flex;align-items:center;gap:6px;font-weight:700;font-size:18px;letter-spacing:-.5px}
+.logo span.m{background:var(--accent);color:#fff;border-radius:8px;padding:2px 6px;font-size:16px}
+.search{flex:0 1 640px;display:flex;margin:0 16px;min-width:0}
+.search input{flex:1;min-width:0;height:40px;border:1px solid var(--line);border-radius:20px 0 0 20px;padding:0 16px;background:var(--bg);color:var(--text);font-size:16px;outline:0}
+.search input:focus{border-color:var(--accent)}
+.search button{width:64px;height:40px;border:1px solid var(--line);border-left:0;border-radius:0 20px 20px 0;background:var(--bg2)}
+.lang{border:1px solid var(--line);border-radius:18px;padding:6px 12px;font-weight:500}
+.lang:hover{background:var(--hover)}
+aside{position:fixed;top:56px;left:0;bottom:0;width:240px;padding:12px;overflow-y:auto;background:var(--bg);z-index:40;transition:transform .2s}
+aside.hide{transform:translateX(-100%);box-shadow:none!important}
+.side a{display:flex;align-items:center;gap:20px;height:40px;padding:0 12px;border-radius:10px;cursor:pointer}
+.side a:hover{background:var(--hover)}
+.side a.on{background:var(--bg2);font-weight:600}
+.side hr{border:0;border-top:1px solid var(--line);margin:12px 0}
+.side h5{padding:6px 12px;color:var(--muted);font-weight:500}
+.side small{display:block;padding:8px 12px;color:var(--muted);line-height:1.6}
+main{margin:56px 0 0 240px;padding:0 24px 24px;transition:margin .2s}
+main.full{margin-left:0}
+.chips{position:sticky;top:56px;background:var(--bg);z-index:30;display:flex;gap:12px;overflow-x:auto;padding:12px 0;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{background:var(--chip);border-radius:8px;padding:6px 12px;white-space:nowrap;font-weight:500}
+.chip:hover{filter:brightness(.95)}
+.chip.on{background:var(--chipA);color:var(--chipAt)}
+.car{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;border-radius:14px;margin:4px 0 16px}
+.car::-webkit-scrollbar{display:none}
+.slide{flex:0 0 100%;scroll-snap-align:start;position:relative;height:clamp(130px,26vw,270px);border-radius:14px;overflow:hidden;background:var(--bg2)}
+.slide img{width:100%;height:100%;object-fit:cover;display:block}
+.cap{position:absolute;left:0;right:0;bottom:0;padding:28px 18px 14px;color:#fff;background:linear-gradient(transparent,#000a);display:flex;flex-direction:column;gap:2px}
+.cap b{font-size:20px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:24px 16px;margin-top:8px}
+.card{cursor:pointer}
+.th{aspect-ratio:1/1;border-radius:12px;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;background:var(--bg2);transition:border-radius .15s}
+.card:hover .th{border-radius:4px}
+.th .fb{font-size:46px;opacity:.4}
+.ph{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:var(--bg2)}
+.tag{position:absolute;bottom:8px;right:8px;background:#000c;color:#fff;border-radius:4px;padding:2px 6px;font-size:12px;font-weight:600}
+.fav{position:absolute;top:6px;right:6px;width:34px;height:34px;border-radius:50%;background:#000a;color:#fff;font-size:17px;display:flex;align-items:center;justify-content:center;z-index:2}
+.fav.on{color:#ff5a7a}
+.meta{margin-top:10px}
+.meta h3{font-size:15px;font-weight:500;line-height:1.3;max-height:2.6em;overflow:hidden}
+.meta p{color:var(--muted);margin:4px 0 8px}
+.addb{background:var(--accent);color:#fff;border-radius:18px;height:32px;padding:0 14px;font-weight:500;width:100%}
+.addb:hover{opacity:.9}
+.empty{text-align:center;color:var(--muted);padding:80px 0;font-size:16px}
+.watch{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:24px;padding-top:24px}
+.big{position:relative;border-radius:14px;overflow:hidden;background:var(--bg2);aspect-ratio:4/3;max-height:70vh;width:100%;display:flex;align-items:center;justify-content:center}
+.big .ph{object-fit:contain;background:#111}
+.watch h1{font-size:22px;font-weight:600;margin:12px 0}
+.row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:12px 0}
+.btn{background:var(--chipA);color:var(--chipAt);border-radius:20px;padding:0 18px;height:38px;font-weight:500;display:inline-flex;align-items:center;gap:6px}
+.btn.s{background:var(--chip);color:var(--text)}
+.btn.g{background:#16a34a;color:#fff}
+.btn.b{background:var(--accent);color:#fff}
+.btn:hover{opacity:.88}
+.desc{background:var(--bg2);border-radius:12px;padding:12px;line-height:1.7;margin-top:12px}
+.qty{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:20px;height:38px}
+.qty button{width:36px;height:36px;font-size:18px}
+.qty span{min-width:24px;text-align:center}
+.sug{display:flex;gap:8px;margin-bottom:12px;cursor:pointer}
+.sug .th{width:130px;flex:none;border-radius:8px}
+.sug h4{font-size:14px;font-weight:500;line-height:1.3}
+.sug p{color:var(--muted);font-size:12px;margin-top:4px}
+.ov{position:fixed;inset:0;background:#0008;z-index:90;display:none}
+.ov.on{display:block}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(440px,100%);background:var(--bg);z-index:100;transform:translateX(100%);transition:transform .2s;display:flex;flex-direction:column}
+.drawer.on{transform:none}
+.dh{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line);font-size:18px;font-weight:600}
+.db{flex:1;overflow-y:auto;padding:12px 16px}
+.df{padding:16px;border-top:1px solid var(--line)}
+.li{display:flex;gap:10px;margin-bottom:14px;align-items:center}
+.li .th{width:84px;flex:none;border-radius:8px}
+.li .i{flex:1;min-width:0}
+.li h4{font-size:14px;font-weight:500}
+.modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--bg);border-radius:16px;padding:24px;width:min(400px,92%);z-index:100;display:none}
+.modal.on{display:block}
+.modal h2{margin-bottom:14px}
+.field{display:block;margin-bottom:12px}
+.field span{display:block;color:var(--muted);margin-bottom:4px}
+.field input,.field textarea,.field select{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--bg);color:var(--text);font:inherit;font-size:16px}
+.modes{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:6px 0 16px}
+.mode{border:2px solid var(--line);border-radius:12px;padding:10px;text-align:left;line-height:1.4}
+.mode small{display:block;color:var(--muted)}
+.mode.on{border-color:var(--accent);background:var(--bg2)}
+.recap{background:var(--bg2);border-radius:12px;padding:12px;margin:8px 0 12px}
+.recap .l{display:flex;justify-content:space-between;gap:10px;padding:3px 0}
+.recap .tot{border-top:1px solid var(--line);margin-top:6px;padding-top:8px;font-size:16px}
+.err{color:var(--red);min-height:18px;margin-bottom:8px}
+.order{border:1px solid var(--line);border-radius:12px;padding:14px;margin-top:12px;line-height:1.6}
+.foot{margin-top:40px;padding-top:16px;border-top:1px solid var(--line);color:var(--muted);text-align:center;line-height:1.7}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#303030;color:#fff;padding:12px 20px;border-radius:8px;z-index:200;transition:transform .25s;pointer-events:none}
+.toast.on{transform:translateX(-50%)}
+.wa{position:fixed;right:18px;bottom:18px;width:54px;height:54px;border-radius:50%;background:#25d366;color:#fff;display:flex;align-items:center;justify-content:center;font-size:26px;box-shadow:0 4px 14px #0004;z-index:35}
+@media(max-width:1000px){.watch{grid-template-columns:1fr}}
+@media(max-width:800px){
+ aside{box-shadow:0 0 30px #0006}
+ main{margin-left:0;padding:0 12px 24px}
+ .logo b{display:none}
+ .search{margin:0 4px}
+ .search button{width:48px}
+ .hide-m{display:none}
+ .grid{grid-template-columns:repeat(2,1fr);gap:18px 10px}
+ .meta h3{font-size:14px}
+}
+</style>
+</head>
+<body>
+<header>
+ <div class="hl">
+  <button class="ic" id="menuBtn" aria-label="Menu">☰</button>
+  <a class="logo" href="#/"><span class="m">⏱</span><b>TicTacShop</b></a>
+ </div>
+ <form class="search" id="sf" autocomplete="off">
+  <input id="q" type="search" placeholder="Rechercher">
+  <button type="submit" aria-label="Rechercher">🔍</button>
+ </form>
+ <div class="hr">
+  <button class="lang hide-m" id="langBtn">EN</button>
+  <button class="ic hide-m" id="themeBtn" aria-label="Thème">🌙</button>
+  <button class="ic" id="userBtn" aria-label="Compte">👤</button>
+  <button class="ic" id="cartBtn" aria-label="Panier">🛒<span class="badge" id="cartN">0</span></button>
+ </div>
+</header>
+
+<aside id="side" class="side"></aside>
+<main id="main"></main>
+
+<a class="wa" id="waFloat" target="_blank" rel="noopener" aria-label="WhatsApp">💬</a>
+
+<div class="ov" id="ov"></div>
+<div class="drawer" id="drawer"></div>
+<div class="modal" id="modal"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+const WA='237680846861';
+const PHONE='+237 680 84 68 61';
+/* Données importées de l'ancien site : 40 montres, 3 bannières, tarifs de livraison */
+const DATA={"products":[{"id":1,"n":"Montre classique homme","p":15000,"c":"Hommes","en":"Classic men's watch"},{"id":2,"n":"Montre sport étanche","p":22000,"c":"Sport","en":"Waterproof sport watch"},{"id":3,"n":"Montre femme dorée","p":18000,"c":"Femmes","en":"Golden women's watch"},{"id":5,"n":"Montre cuir marron","p":12500,"c":"Hommes","en":"Brown leather watch"},{"id":6,"n":"Montre bracelet argent","p":16500,"c":"Femmes","en":"Silver bracelet watch"},{"id":7,"n":"Montre chrono noir et or","p":15000,"c":"Hommes","en":"Black and gold chronograph watch"},{"id":8,"n":"Montre chrono acier cadran blanc","p":15000,"c":"Hommes","en":"Steel chronograph watch, white dial"},{"id":9,"n":"Montre chrono noire cadran bleu","p":15000,"c":"Hommes","en":"Black chronograph watch, blue dial"},{"id":10,"n":"Montre chrono acier cadran bleu","p":15000,"c":"Hommes","en":"Steel chronograph watch, blue dial"},{"id":11,"n":"Montre carrée acier cadran bleu","p":20000,"c":"Hommes","en":"Square steel watch, blue dial"},{"id":12,"n":"Montre carrée acier et or","p":20000,"c":"Hommes","en":"Square steel and gold watch"},{"id":13,"n":"Montre chrono acier et or cadran blanc","p":22000,"c":"Hommes","en":"Steel and gold chronograph watch, white dial"},{"id":14,"n":"Montre acier et or cadran vert","p":20000,"c":"Hommes","en":"Steel and gold watch, green dial"},{"id":15,"n":"Montre acier cadran gris","p":18000,"c":"Hommes","en":"Steel watch, gray dial"},{"id":16,"n":"Montre acier cadran bleu à cristaux","p":18000,"c":"Hommes","en":"Steel watch, blue crystal dial"},{"id":17,"n":"Montre acier cadran blanc à cristaux","p":18000,"c":"Hommes","en":"Steel watch, white crystal dial"},{"id":18,"n":"Montre dorée cadran noir","p":30000,"c":"Hommes","en":"Golden watch, black dial"},{"id":19,"n":"Montre dorée squelette chrono","p":30000,"c":"Hommes","en":"Golden skeleton chronograph watch"},{"id":20,"n":"Montre bleue chrono tout acier","p":25000,"c":"Hommes","en":"Blue all-steel chronograph watch"},{"id":21,"n":"Montre acier cadran bleu squelette","p":30000,"c":"Hommes","en":"Steel skeleton watch, blue dial"},{"id":22,"n":"Montre dorée cadran blanc cuir marron","p":30000,"c":"Hommes","en":"Golden watch, white dial, brown leather"},{"id":23,"n":"Montre dorée bracelet acier","p":30000,"c":"Hommes","en":"Golden watch, steel bracelet"},{"id":24,"n":"Montre acier cadran bleu","p":30000,"c":"Hommes","en":"Steel watch, blue dial"},{"id":25,"n":"Montre acier bracelet caoutchouc noir","p":25000,"c":"Hommes","en":"Steel watch, black rubber strap"},{"id":26,"n":"Montre acier noir cadran anniversaire","p":12000,"c":"Hommes","en":"Black steel watch, anniversary dial"},{"id":27,"n":"Montre fine noire bracelet maille","p":7500,"c":"Hommes","en":"Thin black watch, mesh bracelet"},{"id":28,"n":"Montre fine cuir noir cadran noir","p":9000,"c":"Hommes","en":"Thin watch, black leather, black dial"},{"id":29,"n":"Montre carrée cuir marron","p":14000,"c":"Hommes","en":"Square watch, brown leather"},{"id":30,"n":"Montre fine cuir noir cadran blanc","p":12000,"c":"Femmes","en":"Thin watch, black leather, white dial"},{"id":31,"n":"Montre fine cuir noir cadran noir et or rose","p":11000,"c":"Femmes","en":"Thin watch, black leather, black and rose gold dial"},{"id":32,"n":"Montre carrée verte bracelet silicone","p":7500,"c":"Femmes","en":"Square green watch, silicone strap"},{"id":33,"n":"Montre chrono sport bracelet silicone","p":20000,"c":"Sport","en":"Sport chronograph watch, silicone strap"},{"id":34,"n":"Montre sport cuir marron cadran bleu","p":15000,"c":"Sport","en":"Sport watch, brown leather, blue dial"},{"id":35,"n":"Montre digitale noire cercle bleu","p":8000,"c":"Sport","en":"Black digital watch, blue circle"},{"id":36,"n":"Montre digitale noire","p":8000,"c":"Sport","en":"Black digital watch"},{"id":37,"n":"Montre digitale verte","p":8000,"c":"Sport","en":"Green digital watch"},{"id":38,"n":"Montre sport silicone noire","p":10000,"c":"Sport","en":"Black silicone sport watch"},{"id":39,"n":"Montre sport silicone marron","p":10000,"c":"Sport","en":"Brown silicone sport watch"},{"id":40,"n":"Montre sport silicone verte","p":10000,"c":"Sport","en":"Green silicone sport watch"},{"id":41,"n":"Montre sport silicone bleue","p":10000,"c":"Sport","en":"Blue silicone sport watch"}],"banners":[{"fr":["Nouvelles montres","Arrivage de la semaine"],"en":["New watches","This week's arrivals"]},{"fr":["Montres sport","Étanches et solides"],"en":["Sport watches","Waterproof and tough"]},{"fr":["Livraison partout","Dans tout le Cameroun"],"en":["Delivery everywhere","Across Cameroon"]}],"tarifs":{"Douala":[["Akwa",1500],["Bali",1500],["Bonanjo",1500],["Deido",1500],["Bonamoussadi",1000],["Makepe",1000],["Logpom",1500],["Kotto",1500],["Bépanda",1500],["New-Bell",2000],["Bonabéri",2000],["Japoma",2000],["Yassa",2500],["PK 8",2000],["PK 10",2500]],"Yaoundé":[["Centre-ville",1500],["Bastos",1500],["Mfoundi",1500],["Elig-Essono",1500],["Essos",1500],["Nlongkak",1500],["Mokolo",1500],["Mvan",2000],["Odza",2000],["Nsam",2000],["Biyem-Assi",2000],["Mendong",2000],["Emana",2000],["Nkolbisson",2500],["Soa",3000]],"Bafoussam":[["Centre-ville",1000],["Tamdja",1000],["Djeleng",1000],["Banengo",1500],["Tougang",1500],["Kamkop",1500],["Tyo",2000],["Bamendzi",1500]]}};
+const P=DATA.products, BAN=DATA.banners, TARIFS=DATA.tarifs;
+const CATS=['Toutes','Hommes','Femmes','Sport'];
+
+const T={
+fr:{loc:'fr-FR',home:'Accueil',favs:'Favoris',orders:'Mes commandes',cart:'Panier',cats:'Catégories',contact:'Nous contacter',search:'Que cherchez-vous ?',
+Toutes:'Toutes',Hommes:'Hommes',Femmes:'Femmes',Sport:'Sport',
+add:'Ajouter au panier',order:'Commander',total:'Total',finalize:'Finaliser ma commande',howReceive:'Comment souhaitez-vous recevoir votre commande ?',
+homeDelivery:'Livraison à domicile',homeDeliveryD:'Recevez votre commande à l\'adresse indiquée.',pickup:'Retrait sur place',pickupD:'Retirez votre commande directement.',
+pickupAddr:'Retrait au bureau : Ange Raphaël, Douala.',name:'Nom et prénom',phName:'Ex. : Jean Dupont',phone:'Téléphone / WhatsApp',phPhone:'Ex. : 6XX XX XX XX',
+city:'Ville',district:'Quartier',selCity:'Sélectionnez votre ville',selCityFirst:'Sélectionnez d\'abord une ville',selDistrict:'Sélectionnez votre quartier',
+addr:'Adresse / repère',phAddr:'Rue, immeuble, lieu-dit...',precision:'Précision pour le livreur',optional:'(facultatif)',phPrecision:'Ex. : près de..., portail bleu...',
+delivery:'Livraison',toSelect:'À sélectionner',free:'Gratuit',recap:'RÉCAPITULATIF',confirm:'Confirmer ma commande →',
+afterConfirm:'Après confirmation, TicTacShop pourra vous contacter pour confirmer la disponibilité, la livraison et le paiement.',
+needName:'Merci d\'indiquer votre nom.',needPhone:'Merci d\'indiquer un numéro de téléphone valide.',needCity:'Merci de sélectionner votre ville.',needDistrict:'Merci de sélectionner votre quartier.',needAddr:'Merci d\'indiquer votre adresse ou un repère.',
+hello:'Bonjour TicTacShop, je souhaite commander :',lName:'Nom',lPhone:'Téléphone',lMode:'Réception',lCity:'Ville',lDistrict:'Quartier',lAddr:'Adresse / repère',lPrecision:'Précision',
+none:'Aucune montre trouvée.',noFav:'Aucun favori pour le moment.',noOrd:'Aucune commande enregistrée.',emptyCart:'Votre panier est vide.',
+added:'Ajouté au panier',favAdd:'Ajouté aux favoris',favDel:'Retiré des favoris',saved:'Informations enregistrées',ordered:'Commande envoyée sur WhatsApp, merci !',cleared:'Informations effacées',
+related:'Autres montres',account:'Mon compte',save:'Enregistrer',clear:'Effacer mes infos',close:'Fermer',orderOn:'Commande du',
+tagline:'Montres de qualité, livrées partout au Cameroun',office:'📍 Bureau : Ange Raphaël, Douala, Cameroun',rights:'© 2026 TicTacShop. Tous droits réservés.',
+writeWa:'Écrire sur WhatsApp',lang:'English',dark:'Mode sombre',light:'Mode clair'},
+en:{loc:'en-US',home:'Home',favs:'Favorites',orders:'My orders',cart:'Cart',cats:'Categories',contact:'Contact us',search:'What are you looking for?',
+Toutes:'All',Hommes:'Men',Femmes:'Women',Sport:'Sport',
+add:'Add to cart',order:'Order',total:'Total',finalize:'Complete my order',howReceive:'How would you like to receive your order?',
+homeDelivery:'Home delivery',homeDeliveryD:'Receive your order at the address you give.',pickup:'Pick up in person',pickupD:'Collect your order directly.',
+pickupAddr:'Pick-up at the office: Ange Raphaël, Douala.',name:'Full name',phName:'E.g. John Smith',phone:'Phone / WhatsApp',phPhone:'E.g. 6XX XX XX XX',
+city:'City',district:'Neighborhood',selCity:'Select your city',selCityFirst:'Select a city first',selDistrict:'Select your neighborhood',
+addr:'Address / landmark',phAddr:'Street, building, area...',precision:'Details for the delivery person',optional:'(optional)',phPrecision:'E.g. near..., blue gate...',
+delivery:'Delivery',toSelect:'To be selected',free:'Free',recap:'SUMMARY',confirm:'Confirm my order →',
+afterConfirm:'After confirmation, TicTacShop may contact you to confirm availability, delivery and payment.',
+needName:'Please enter your name.',needPhone:'Please enter a valid phone number.',needCity:'Please select your city.',needDistrict:'Please select your neighborhood.',needAddr:'Please enter your address or a landmark.',
+hello:'Hello TicTacShop, I would like to order:',lName:'Name',lPhone:'Phone',lMode:'Reception',lCity:'City',lDistrict:'Neighborhood',lAddr:'Address / landmark',lPrecision:'Details',
+none:'No watches found.',noFav:'No favorites yet.',noOrd:'No saved orders.',emptyCart:'Your cart is empty.',
+added:'Added to cart',favAdd:'Added to favorites',favDel:'Removed from favorites',saved:'Details saved',ordered:'Order sent on WhatsApp, thank you!',cleared:'Info cleared',
+related:'More watches',account:'My account',save:'Save',clear:'Clear my info',close:'Close',orderOn:'Order of',
+tagline:'Quality watches, delivered all over Cameroon',office:'📍 Office: Ange Raphaël, Douala, Cameroon',rights:'© 2026 TicTacShop. All rights reserved.',
+writeWa:'Write on WhatsApp',lang:'Français',dark:'Dark mode',light:'Light mode'}
+};
+
+/* état */
+const load=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k));return v??d}catch(e){return d}};
+const save=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+let lang=load('tt_lang','fr'),theme=load('tt_theme','light'),cart=load('tt_cart',{}),favs=load('tt_favs',[]),orders=load('tt_orders',[]),user=load('tt_user',{}),cat='Toutes',query='';
+let co={mode:'livraison',name:user.name||'',phone:user.phone||'',city:'',district:'',addr:'',info:''};
+cart=Object.fromEntries(Object.entries(cart).filter(([id])=>P.some(p=>p.id==id)));
+const t=k=>T[lang][k]||k;
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=n=>n.toLocaleString(t('loc')).replace(/ | /g,' ')+' FCFA';
+const byId=id=>P.find(x=>x.id==id);
+const nm=p=>lang==='en'?p.en:p.n;
+const norm=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,' ').trim();
+
+/* photo : images/<id>.jpg ; si absente, une icône reste affichée */
+const pic=p=>`<span class="fb">⌚</span><img class="ph" src="images/${p.id}.jpg" alt="${esc(nm(p))}" loading="lazy" onerror="this.remove()">`;
+
+/* routage */
+const route=()=>location.hash.replace(/^#\/?/,'').split('/');
+window.addEventListener('hashchange',()=>{render();window.scrollTo(0,0);if(innerWidth<=800)closeSide()});
+
+function sideHTML(){
+ const r=route()[0];
+ const it=(h,i,l)=>`<a href="#/${h}" class="${r===h?'on':''}"><span>${i}</span>${t(l)}</a>`;
+ return it('','🏠','home')+it('favs','❤️','favs')+it('orders','📦','orders')+`<a id="sCart"><span>🛒</span>${t('cart')}</a><hr>
+ <h5>${t('cats')}</h5>`+['Hommes','Femmes','Sport'].map(c=>`<a data-sc="${c}" class="${!r&&cat===c?'on':''}"><span>${c==='Hommes'?'👔':c==='Femmes'?'💎':'🏃'}</span>${t(c)}</a>`).join('')+`<hr>
+ <a href="https://wa.me/${WA}" target="_blank" rel="noopener"><span>💬</span>${t('contact')}</a>
+ <a id="sLang"><span>🌐</span>${t('lang')}</a>
+ <a id="sTheme"><span>${theme==='dark'?'☀️':'🌙'}</span>${theme==='dark'?t('light'):t('dark')}</a>
+ <small>📞 ${PHONE}<br>${t('office')}</small>`;
+}
+
+function card(p){
+ const f=favs.includes(p.id);
+ return `<div class="card" data-id="${p.id}">
+  <div class="th">${pic(p)}<span class="tag">${fmt(p.p)}</span><button class="fav ${f?'on':''}" data-fav="${p.id}" aria-label="Favori">${f?'♥':'♡'}</button></div>
+  <div class="meta"><h3>${esc(nm(p))}</h3><p>${t(p.c)}</p><button class="addb" data-add="${p.id}">${t('add')}</button></div></div>`;
+}
+
+const footer=()=>`<div class="foot"><b>TicTacShop</b> — ${t('tagline')}<br>${t('office')}<br>📞 ${PHONE}<br>${t('rights')}</div>`;
+
+function render(){
+ document.documentElement.dataset.theme=theme;document.documentElement.lang=lang;
+ $('#side').innerHTML=sideHTML();
+ $('#waFloat').href=`https://wa.me/${WA}`;
+ $('#langBtn').textContent=lang==='fr'?'EN':'FR';
+ $('#q').placeholder=innerWidth<=800?(lang==='fr'?'Rechercher':'Search'):t('search');
+ $('#themeBtn').textContent=theme==='dark'?'☀️':'🌙';
+ const [r,id]=route(),m=$('#main');
+ if(r==='p'&&byId(id))m.innerHTML=productHTML(byId(id))+footer();
+ else if(r==='orders')m.innerHTML=ordersHTML()+footer();
+ else{
+  let list=P.slice();
+  if(r==='favs')list=list.filter(p=>favs.includes(p.id));
+  if(cat!=='Toutes')list=list.filter(p=>p.c===cat);
+  const qn=norm(query);
+  if(qn)list=list.filter(p=>norm([p.n,p.en,p.c,p.p].join(' ')).includes(qn));
+  const chips=`<div class="chips">${CATS.map(c=>`<button class="chip ${cat===c?'on':''}" data-cat="${c}">${t(c)}</button>`).join('')}</div>`;
+  const car=(!r&&!qn&&cat==='Toutes')?`<div class="car" id="car">${BAN.map((b,i)=>`<div class="slide"><img src="images/banner${i+1}.jpg" alt="${esc(b[lang][0])}" onerror="this.remove()"><div class="cap"><b>${esc(b[lang][0])}</b><span>${esc(b[lang][1])}</span></div></div>`).join('')}</div>`:'';
+  const empty=r==='favs'?t('noFav'):t('none');
+  m.innerHTML=chips+car+(list.length?`<div class="grid">${list.map(card).join('')}</div>`:`<div class="empty">${empty}</div>`)+footer();
+ }
+ updateCartBadge();
+}
+
+function productHTML(p){
+ const f=favs.includes(p.id);
+ const others=P.filter(x=>x.id!==p.id).sort((a,b)=>(b.c===p.c)-(a.c===p.c)).slice(0,10);
+ return `<div class="watch"><div>
+  <div class="big">${pic(p)}</div>
+  <h1>${esc(nm(p))}</h1>
+  <div class="row"><span style="font-size:22px;font-weight:600">${fmt(p.p)}</span><span style="color:var(--muted)">· ${t(p.c)}</span></div>
+  <div class="row">
+   <div class="qty"><button data-q="-1">−</button><span id="pq">1</span><button data-q="1">+</button></div>
+   <button class="btn b" data-add="${p.id}">🛒 ${t('add')}</button>
+   <button class="btn g" data-buy="${p.id}">${t('order')}</button>
+   <button class="btn s" data-fav="${p.id}">${f?'♥':'♡'} ${t('favs')}</button>
+  </div>
+  <div class="desc">🚚 ${t('tagline')}<br>💬 ${t('writeWa')} : ${PHONE}</div></div>
+  <div><h3 style="margin-bottom:12px">${t('related')}</h3>${others.map(o=>`<div class="sug" data-id="${o.id}"><div class="th">${pic(o)}</div><div><h4>${esc(nm(o))}</h4><p>${t(o.c)}<br><b>${fmt(o.p)}</b></p></div></div>`).join('')}</div></div>`;
+}
+
+function ordersHTML(){
+ if(!orders.length)return `<div class="empty">${t('noOrd')}</div>`;
+ return `<div style="max-width:720px;margin:24px auto"><h2>${t('orders')}</h2>`+orders.map(o=>`<div class="order"><b>${t('orderOn')} ${esc(o.date)}</b><br>${o.items.map(i=>`${i.q} × ${esc(i.n)}`).join('<br>')}<br>${t('delivery')} : ${o.retrait?t('free'):fmt(o.fee||0)}<br><b>${t('total')} : ${fmt(o.total)}</b></div>`).join('')+'</div>';
+}
+
+/* panier */
+const cartCount=()=>Object.values(cart).reduce((a,b)=>a+b,0);
+const cartTotal=()=>Object.entries(cart).reduce((s,[id,q])=>s+byId(id).p*q,0);
+function updateCartBadge(){const n=cartCount();$('#cartN').textContent=n;$('#cartN').style.display=n?'':'none'}
+function addToCart(id,q=1,silent){cart[id]=(cart[id]||0)+q;save('tt_cart',cart);updateCartBadge();if(!silent)toast(t('added'))}
+function setQty(id,q){if(q<=0)delete cart[id];else cart[id]=q;save('tt_cart',cart);updateCartBadge();drawCart(Object.keys(cart).length?drawer.checkout:false)}
+const drawer={checkout:false};
+
+function feeInfo(){
+ if(co.mode==='retrait')return{retrait:true,ok:true,price:0};
+ const x=(TARIFS[co.city]||[]).find(a=>a[0]===co.district);
+ return{retrait:false,ok:!!x,price:x?x[1]:0};
+}
+
+function checkoutHTML(){
+ const f=feeInfo();
+ const opts=(arr,cur,ph)=>`<option value="">${esc(ph)}</option>`+arr.map(([v,l])=>`<option value="${esc(v)}" ${v===cur?'selected':''}>${esc(l)}</option>`).join('');
+ const cityOpts=opts(Object.keys(TARIFS).map(c=>[c,c]),co.city,t('selCity'));
+ const distOpts=co.city?opts(TARIFS[co.city].map(([q,pr])=>[q,`${q} — ${pr} FCFA`]),co.district,t('selDistrict')):`<option value="">${esc(t('selCityFirst'))}</option>`;
+ const lines=Object.entries(cart).map(([id,q])=>{const p=byId(id);return `<div class="l"><span>${esc(nm(p))} × ${q}</span><b>${fmt(p.p*q)}</b></div>`}).join('');
+ return `<form id="coForm" novalidate>
+ <b>${t('howReceive')}</b>
+ <div class="modes"><button type="button" class="mode ${co.mode==='livraison'?'on':''}" data-mode="livraison">🚚 <b>${t('homeDelivery')}</b><small>${t('homeDeliveryD')}</small></button>
+ <button type="button" class="mode ${co.mode==='retrait'?'on':''}" data-mode="retrait">🏬 <b>${t('pickup')}</b><small>${t('pickupD')}</small></button></div>
+ <label class="field"><span>${t('name')}</span><input data-co="name" value="${esc(co.name)}" placeholder="${esc(t('phName'))}"></label>
+ <label class="field"><span>${t('phone')}</span><input data-co="phone" type="tel" value="${esc(co.phone)}" placeholder="${esc(t('phPhone'))}"></label>
+ ${co.mode==='livraison'?`<label class="field"><span>${t('city')}</span><select data-co="city">${cityOpts}</select></label>
+ <label class="field"><span>${t('district')}</span><select data-co="district" ${co.city?'':'disabled'}>${distOpts}</select></label>
+ <label class="field"><span>${t('addr')}</span><input data-co="addr" value="${esc(co.addr)}" placeholder="${esc(t('phAddr'))}"></label>
+ <label class="field"><span>${t('precision')} ${t('optional')}</span><input data-co="info" value="${esc(co.info)}" placeholder="${esc(t('phPrecision'))}"></label>`
+ :`<div class="desc" style="margin:0 0 12px">📍 ${t('pickupAddr')}</div>`}
+ <div class="recap"><b style="font-size:12px;color:var(--muted)">${t('recap')}</b>${lines}
+  <div class="l"><span>${f.retrait?t('pickup'):t('delivery')}</span><b>${f.retrait?t('free'):f.ok?fmt(f.price):t('toSelect')}</b></div>
+  <div class="l tot"><b>${t('total')}</b><b>${fmt(cartTotal()+f.price)}</b></div></div>
+ <div class="err" id="err"></div>
+ <button class="btn g" type="submit" style="width:100%;justify-content:center">${t('confirm')}</button>
+ <p style="color:var(--muted);margin-top:10px;line-height:1.5">${t('afterConfirm')}</p></form>`;
+}
+
+function drawCart(checkout){
+ drawer.checkout=!!checkout;
+ const d=$('#drawer'),ids=Object.keys(cart);
+ let body;
+ if(!ids.length){body=`<div class="empty">${t('emptyCart')}</div>`;drawer.checkout=false}
+ else if(drawer.checkout)body=checkoutHTML();
+ else body=ids.map(id=>{const p=byId(id),q=cart[id];return `<div class="li"><div class="th">${pic(p)}</div><div class="i"><h4>${esc(nm(p))}</h4><div style="color:var(--muted);margin:2px 0">${fmt(p.p)}</div>
+  <div class="qty"><button data-cq="${id}" data-d="-1">−</button><span>${q}</span><button data-cq="${id}" data-d="1">+</button></div></div><button class="ic" data-cq="${id}" data-d="-999" aria-label="Supprimer">🗑️</button></div>`}).join('');
+ d.innerHTML=`<div class="dh"><span>${drawer.checkout?t('finalize'):'🛒 '+t('cart')}</span><button class="ic" id="dClose" aria-label="${t('close')}">✕</button></div><div class="db">${body}</div>
+ ${ids.length&&!drawer.checkout?`<div class="df"><div class="row" style="justify-content:space-between;margin-top:0"><b>${t('total')}</b><b>${fmt(cartTotal())}</b></div><button class="btn b" id="goCo" style="width:100%;justify-content:center">${t('order')}</button></div>`:''}`;
+ d.classList.add('on');$('#ov').classList.add('on');
+}
+function closeAll(){$('#drawer').classList.remove('on');$('#modal').classList.remove('on');$('#ov').classList.remove('on')}
+
+function sendOrder(){
+ const err=m=>{$('#err').textContent=m};
+ if(!co.name.trim())return err(t('needName'));
+ if(co.phone.replace(/\D/g,'').length<8)return err(t('needPhone'));
+ if(co.mode==='livraison'){
+  if(!co.city)return err(t('needCity'));
+  if(!co.district)return err(t('needDistrict'));
+  if(!co.addr.trim())return err(t('needAddr'));
+ }
+ const f=feeInfo(),items=Object.entries(cart).map(([id,q])=>({n:nm(byId(id)),q,p:byId(id).p}));
+ const total=cartTotal()+f.price;
+ let msg=t('hello')+'\n'+items.map(i=>`- ${i.n} × ${i.q} (${fmt(i.p*i.q)})`).join('\n');
+ msg+='\n\n'+(f.retrait?`${t('pickup')} : ${t('free')}`:`${t('delivery')} (${co.district}, ${co.city}) : ${fmt(f.price)}`);
+ msg+=`\n${t('total')} : ${fmt(total)}\n\n${t('lName')} : ${co.name.trim()}\n${t('lPhone')} : ${co.phone.trim()}`;
+ if(f.retrait)msg+=`\n${t('lMode')} : ${t('pickupAddr')}`;
+ else{
+  msg+=`\n${t('lMode')} : ${t('homeDelivery')}\n${t('lCity')} : ${co.city}\n${t('lDistrict')} : ${co.district}\n${t('lAddr')} : ${co.addr.trim()}`;
+  if(co.info.trim())msg+=`\n${t('lPrecision')} : ${co.info.trim()}`;
+ }
+ user={name:co.name.trim(),phone:co.phone.trim()};save('tt_user',user);
+ orders.unshift({date:new Date().toLocaleString(t('loc')),items,fee:f.price,retrait:f.retrait,total});save('tt_orders',orders);
+ cart={};save('tt_cart',cart);updateCartBadge();
+ co.addr='';co.info='';co.district='';co.city='';
+ closeAll();
+ const url=`https://wa.me/${WA}?text=${encodeURIComponent(msg)}`;
+ let w=null;try{w=window.open(url,'_blank')}catch(e){}
+ if(!w){location.href=url}
+ toast(t('ordered'));
+}
+
+/* compte */
+function openAccount(){
+ const m=$('#modal');
+ m.innerHTML=`<h2>👤 ${t('account')}</h2><form id="uForm"><label class="field"><span>${t('name')}</span><input name="name" value="${esc(user.name||'')}"></label>
+ <label class="field"><span>${t('phone')}</span><input name="phone" type="tel" value="${esc(user.phone||'')}"></label>
+ <div class="row"><button class="btn b" type="submit">${t('save')}</button><button class="btn s" type="button" id="uClear">${t('clear')}</button></div></form>`;
+ m.classList.add('on');$('#ov').classList.add('on');
+}
+
+let tt;
+function toast(s){const e=$('#toast');e.textContent=s;e.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>e.classList.remove('on'),2200)}
+function closeSide(){$('#side').classList.add('hide')}
+function toggleSide(){const s=$('#side');s.classList.toggle('hide');if(innerWidth>800)$('#main').classList.toggle('full',s.classList.contains('hide'))}
+function toggleLang(){lang=lang==='fr'?'en':'fr';save('tt_lang',lang);render();if($('#drawer').classList.contains('on'))drawCart(drawer.checkout)}
+function toggleTheme(){theme=theme==='dark'?'light':'dark';save('tt_theme',theme);render()}
+function goHome(){if(location.hash.replace(/^#\/?/,''))location.hash='#/';else render()}
+
+/* événements */
+document.addEventListener('click',e=>{
+ const el=e.target.closest('[data-fav],[data-add],[data-buy],[data-q],[data-cat],[data-sc],[data-cq],[data-mode],.card,.sug,#goCo,#dClose,#sCart,#sLang,#sTheme,#uClear');
+ if(!el)return;
+ const d=el.dataset;
+ if(d.fav){e.stopPropagation();const id=+d.fav,i=favs.indexOf(id);if(i<0){favs.push(id);toast(t('favAdd'))}else{favs.splice(i,1);toast(t('favDel'))}save('tt_favs',favs);render();return}
+ if(d.add){addToCart(+d.add,$('#pq')?+$('#pq').textContent:1);return}
+ if(d.buy){addToCart(+d.buy,+$('#pq').textContent,true);drawCart(true);return}
+ if(d.q){const q=$('#pq');q.textContent=Math.max(1,+q.textContent+ +d.q);return}
+ if(d.cat){cat=d.cat;goHome();return}
+ if(d.sc){cat=d.sc;goHome();if(innerWidth<=800)closeSide();return}
+ if(d.cq){setQty(d.cq,(cart[d.cq]||0)+ +d.d);return}
+ if(d.mode){co.mode=d.mode;drawCart(true);return}
+ if(el.id==='goCo'){drawCart(true);return}
+ if(el.id==='dClose'){closeAll();return}
+ if(el.id==='sCart'){drawCart(false);return}
+ if(el.id==='sLang'){toggleLang();return}
+ if(el.id==='sTheme'){toggleTheme();return}
+ if(el.id==='uClear'){user={};save('tt_user',user);co.name='';co.phone='';closeAll();toast(t('cleared'));return}
+ if(el.classList.contains('card')||el.classList.contains('sug'))location.hash='#/p/'+d.id;
+});
+document.addEventListener('input',e=>{const k=e.target.dataset&&e.target.dataset.co;if(k&&k!=='city'&&k!=='district')co[k]=e.target.value});
+document.addEventListener('change',e=>{
+ const k=e.target.dataset&&e.target.dataset.co;
+ if(k==='city'){co.city=e.target.value;co.district='';drawCart(true)}
+ if(k==='district'){co.district=e.target.value;drawCart(true)}
+});
+document.addEventListener('submit',e=>{
+ if(e.target.id==='coForm'){e.preventDefault();sendOrder()}
+ if(e.target.id==='uForm'){e.preventDefault();const f=Object.fromEntries(new FormData(e.target));user={name:f.name||'',phone:f.phone||''};save('tt_user',user);co.name=user.name;co.phone=user.phone;closeAll();toast(t('saved'))}
+});
+$('#sf').addEventListener('submit',e=>{e.preventDefault();query=$('#q').value.trim();goHome()});
+$('#q').addEventListener('input',()=>{query=$('#q').value.trim();const r=route()[0];if(!r||r==='favs')render();else if(query)location.hash='#/'});
+$('#menuBtn').onclick=toggleSide;
+$('#ov').onclick=closeAll;
+$('#cartBtn').onclick=()=>drawCart(false);
+$('#userBtn').onclick=openAccount;
+$('#langBtn').onclick=toggleLang;
+$('#themeBtn').onclick=toggleTheme;
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeAll()});
+
+/* bannières : défilement automatique */
+let pause=0;
+setInterval(()=>{const c=$('#car');if(!c||Date.now()<pause||c.children.length<2)return;const w=c.clientWidth+10;let i=Math.round(c.scrollLeft/w)+1;if(i>=c.children.length)i=0;c.scrollTo({left:i*w,behavior:'smooth'})},3000);
+['touchstart','mousedown','wheel'].forEach(ev=>document.addEventListener(ev,e=>{if(e.target.closest&&e.target.closest('#car'))pause=Date.now()+6000},{passive:true}));
+
+if(innerWidth<=800)closeSide();
+render();
+</script>
+</body>
+</html>
